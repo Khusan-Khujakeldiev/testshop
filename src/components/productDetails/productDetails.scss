@@ -1,11 +1,22 @@
 .product-details {
+
+  .btn-back{
+    border-color:rgba(29, 31, 34, 1) ;
+    background-color:rgba(29, 31, 34, 1);
+    opacity: 0.75;
+    color: #fff;
+    &:hover{
+      opacity: 0.8;
+    }
+  }
     .thumbnail-images img {
       cursor: pointer;
       max-width: 100px;
       border: 2px solid transparent;
   
-      &.border-primary {
-        border-color: #007bff;
+      &.border-detail-img {
+        border-color: rgba(29, 31, 34, 0.651);
+        opacity: 0.9;
       }
     }
   

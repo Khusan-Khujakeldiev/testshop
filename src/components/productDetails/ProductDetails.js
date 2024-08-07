@@ -73,7 +73,7 @@ class ProductDetails extends Component {
 
     return (
       <div className="container product-details">
-        <button className="btn btn-primary mb-3" onClick={showFullInfo}>
+        <button className="btn btn-back mb-3" onClick={showFullInfo}>
           Back to Products
         </button>
         <div className="row">
@@ -87,9 +87,8 @@ class ProductDetails extends Component {
                     alt={currentItem.name}
                     onClick={() => this.handleImageClick(index)}
                     className={`img-thumbnail mb-2 ${
-                      selectedImageIndex === index ? "border-primary" : ""
+                      selectedImageIndex === index ? "border-detail-img" : ""
                     }`}
-                    style={{ cursor: "pointer", maxWidth: "100px" }}
                   />
                 ))}
             </div>
