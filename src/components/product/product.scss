@@ -1,0 +1,116 @@
+.product-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+
+    &.out_stock .product-image img {
+      opacity: 0.5;
+    }
+
+    &.out_stock .out-of-stock-overlay {
+      display: flex;
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    &.out_stock .product-card-desc .product-details p{
+      opacity: 0.5;
+    }
+  }
+
+  .product-image {
+    width: 100%;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .product-image img {
+    width: auto;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .no-image {
+    text-align: center;
+    padding: 15px;
+    color: #aaa;
+  }
+
+  .out-of-stock-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    color: rgba(141, 143, 154, 1);
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .product-details {
+    padding: 15px 15px 0 15px;
+    text-align: left;
+
+  }
+
+  .product-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .product-price {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+
+  .product-cart {
+    position: relative;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .product-card-desc {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .add-to-cart {
+    background: rgba(94, 206, 123, 1);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .add-to-cart:hover {
+    background: rgb(85, 188, 113);
+  }
+
+  .add-to-cart img {
+    width: 20px;
+    height: 20px;
+  }
