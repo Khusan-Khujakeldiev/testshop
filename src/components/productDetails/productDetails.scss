@@ -1,5 +1,4 @@
 .product-details {
-
   .btn-back{
     border-color:rgba(29, 31, 34, 1) ;
     background-color:rgba(29, 31, 34, 1);
@@ -15,7 +14,6 @@
       border: 2px solid transparent;
   
       &.border-detail-img {
-        border-color: rgba(29, 31, 34, 0.651);
         opacity: 0.9;
       }
     }
@@ -61,7 +59,7 @@
     .custom-attribute-button {
       margin-right: 5px;
       margin-bottom: 5px;
-      padding: 5px 10px; // Подгоняем размер под текст
+      padding: 5px 10px; 
       background-color: #f8f9fa;
       border: 1px solid #ced4da;
       cursor: pointer;
@@ -77,6 +75,61 @@
         opacity: 0.8;
       }
     }
+    .product-info{
+      .btn-add{
+        padding: 16px 32px;
+        background-color:rgba(94, 206, 123, 1);
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 19.2px;
+        color: #fff;
+        width: 292px;
+        border-radius: 0;
+        margin-bottom: 2em;
+
+      }
+      p{
+        font-family: "Roboto", sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+      }
+    }
+    .product-attributes{
+      .attribute-items{
+        button{
+          font-family:"Roboto", sans-serif ;
+          font-weight: 400;
+          font-size: 16px;
+          
+        }
+      }
+      h3{
+        font-weight: 700;
+        font-size: 18px;
+      }
+    }
+    .product-price {
+      h3{
+      font-weight: 700;
+      font-size: 18px;
+      }
+      p{
+        font-weight: 700;
+        font-size: 24px;
+        color: #000;
+      }
+    }
+    .custom-list ul {
+      list-style-type: none; 
+      padding-left: 0; 
+      margin-left: 0; 
+    }
+    
+    .custom-list li {
+      margin-bottom: 10px;
+    }
+    
+    
   }
   
 //  

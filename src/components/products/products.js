@@ -25,14 +25,12 @@ class Products extends Component {
       .then((response) => response.json())
       .then((result) => {
         if (result.errors) {
-          console.error("GraphQL errors:", result.errors);
           this.setState({ error: result.errors[0], loading: false });
         } else {
           this.setState({ data: result.data, loading: false });
         }
       })
       .catch((error) => {
-        console.error("Fetch error:", error);
         this.setState({ error, loading: false });
       });
   }
@@ -51,7 +49,6 @@ class Products extends Component {
 
     if (loading) return <p>Loading...</p>;
     if (error) {
-      console.error("Error fetching products:", error);
       return <p>Error: {error.message}</p>;
     }
 
@@ -76,6 +73,7 @@ class Products extends Component {
               hoveredProductId={hoveredProductId}
               handleMouseEnter={this.handleMouseEnter}
               handleMouseLeave={this.handleMouseLeave}
+              toggleCartVisibility={this.props.toggleCartVisibility}
             />
           ))}
         </div>

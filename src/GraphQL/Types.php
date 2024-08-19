@@ -2,6 +2,7 @@
 
 namespace App\GraphQL;
 
+use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Doctrine\DBAL\Connection;
@@ -16,6 +17,7 @@ class Types {
     private static $image;
     private static $query;
     private static $mutation;
+    private static $createOrderInput;
 
     public static function product() {
         return self::$product ?: (self::$product = new ObjectType([
@@ -99,7 +101,9 @@ class Types {
             'fields' => [
                 'id' => Type::nonNull(Type::int()),
                 'product' => self::product(),
-                'quantity' => Type::int()
+                'productName' => Type::string(),
+                'quantity' => Type::int(),
+                'createdAt' => Type::string(),
             ]
         ]));
     }
@@ -195,6 +199,24 @@ class Types {
         ]));
     }
 
+    public static function createOrderInput() {
+        return self::$createOrderInput ?: (self::$createOrderInput = new InputObjectType([
+            'name' => 'CreateOrderInput',
+            'fields' => [
+                'productId' => Type::nonNull(Type::string()),
+                'productName' => Type::nonNull(Type::string()),
+                'quantity' => Type::nonNull(Type::int()),
+                'attributes' => Type::listOf(new InputObjectType([
+                    'name' => 'OrderAttributeInput',
+                    'fields' => [
+                        'name' => Type::nonNull(Type::string()),
+                        'value' => Type::nonNull(Type::string())
+                    ]
+                ])),
+            ]
+        ]));
+    }
+
     public static function mutation(Connection $db) {
         return self::$mutation ?: (self::$mutation = new ObjectType([
             'name' => 'Mutation',
@@ -202,24 +224,49 @@ class Types {
                 'createOrder' => [
                     'type' => self::order(),
                     'args' => [
-                        'productId' => Type::nonNull(Type::string()),
-                        'quantity' => Type::nonNull(Type::int())
+                        'input' => Type::nonNull(self::createOrderInput()),
                     ],
                     'resolve' => function ($root, $args) use ($db) {
-                        $sql = "INSERT INTO orders (product_id, quantity) VALUES (?, ?)";
+                        $input = $args['input'];
+    
+                        // Inserting data to database table
+                        $sql = "INSERT INTO orders (product_id, product_name, quantity, created_at) VALUES (?, ?, ?, NOW())";
                         $stmt = $db->prepare($sql);
-                        $stmt->executeStatement([$args['productId'], $args['quantity']]);
-
+                        $stmt->executeStatement([$input['productId'], $input['productName'], $input['quantity']]);
+    
+                        // getting id of gotten order
                         $orderId = $db->lastInsertId();
-
+    
+                        // Adding attributes and connecting to Orders tables if attributes exist
+                        if (!empty($input['attributes'])) {
+                            foreach ($input['attributes'] as $attribute) {
+                                $sql = "INSERT INTO order_attributes (order_id, attribute_name, attribute_value) VALUES (?, ?, ?)";
+                                $stmt = $db->prepare($sql);
+                                $stmt->executeStatement([$orderId, $attribute['name'], $attribute['value']]);
+                            }
+                        }
+    
+                        // getting and returning orders
                         $sql = "SELECT * FROM orders WHERE id = ?";
                         $stmt = $db->prepare($sql);
                         $result = $stmt->executeQuery([$orderId]);
-                        return $result->fetchAssociative();
+                        $orderData = $result->fetchAssociative();
+    
+                        // creating returning object
+                        return [
+                            'id' => $orderData['id'],
+                            'product' => [
+                                'id' => $orderData['product_id'],
+                                'name' => $orderData['product_name'],
+                            ],
+                            'productName' => $orderData['product_name'],
+                            'quantity' => $orderData['quantity'],
+                            'createdAt' => $orderData['created_at'],
+                        ];
                     }
                 ]
             ]
         ]));
     }
+    
 }
-?>

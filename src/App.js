@@ -12,6 +12,7 @@ class App extends Component {
       currentCategory: "All",
       showFullItem: false,
       currentItem: {},
+      isCartVisible: false,
     };
   }
 
@@ -24,27 +25,46 @@ class App extends Component {
     this.setState({
       showFullItem: !this.state.showFullItem,
     });
-    console.log(product);
+  };
+
+  toggleCartVisibility = () => {
+    this.setState((prevState) => ({
+      isCartVisible: !prevState.isCartVisible,
+    }));
   };
 
   render() {
-    const { currentCategory } = this.state;
+    const { currentCategory, showFullItem, isCartVisible } = this.state;
 
     return (
       <div className="wrapper">
+        {isCartVisible && (
+          <div
+            className="overlay-backdrop"
+            onClick={this.toggleCartVisibility}
+          ></div>
+        )}
+
         <Header
           chooseCategory={this.chooseCategory}
           currentCategory={currentCategory}
+          showFullInfo={this.showFullInfo}
+          showFullItem={showFullItem}
+          toggleCartVisibility={this.toggleCartVisibility}
+          isCartVisible={isCartVisible}
         />
-        {this.state.showFullItem ? (
+
+        {showFullItem ? (
           <ProductDetails
+            toggleCartVisibility={this.toggleCartVisibility}
             currentItem={this.state.currentItem}
-            showFullInfo={this.showFullInfo}
+            isCartVisible={isCartVisible}
           />
         ) : (
           <Products
             showFullInfo={this.showFullInfo}
             currentCategory={currentCategory}
+            toggleCartVisibility={this.toggleCartVisibility}
           />
         )}
       </div>

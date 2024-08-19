@@ -1,24 +1,69 @@
 import React, { Component } from "react";
 import "./product.scss";
 import ShoppingCart from "../../img/Vector.svg";
+import { connect } from "react-redux";
+import { addItem } from "../../reducers/cartSlice";
 
 class Product extends Component {
+  handleClick = (e) => {
+    const { showFullInfo, product } = this.props;
+
+    if (!e.target.closest(".add-to-cart")) {
+      showFullInfo(product);
+    }
+  };
+
+  handleAddToCart = () => {
+    const { product, addItem } = this.props;
+
+    // Creating default attributes
+    const defaultAttributes = product.attributes.reduce((acc, attribute) => {
+      const attributeName = attribute.attribute.name;
+      if (!acc[attributeName]) {
+        acc[attributeName] = attribute.display_value;
+      }
+      return acc;
+    }, {});
+
+    //Creating object for adding to cart
+    const item = {
+      id: product.id,
+      name: product.name,
+      price: product.price[0].amount,
+      currency_symbol: product.price[0].currency_symbol,
+      attributes: defaultAttributes,
+      allAttributes: product.attributes.reduce((acc, attribute) => {
+        const attributeName = attribute.attribute.name;
+        if (!acc[attributeName]) {
+          acc[attributeName] = [];
+        }
+        if (!acc[attributeName].includes(attribute.display_value)) {
+          acc[attributeName].push(attribute.display_value);
+        }
+        return acc;
+      }, {}),
+      image: product.images[0].image_url,
+    };
+
+    addItem(item);
+  };
+
   render() {
-    const {
-      product,
-      hoveredProductId,
-      handleMouseEnter,
-      handleMouseLeave,
-      showFullInfo,
-    } = this.props;
+    const { product, hoveredProductId, handleMouseEnter, handleMouseLeave } =
+      this.props;
 
     return (
-      <div className="col-md-4 mb-4">
+      <div
+        className="col-md-4 mb-4"
+        data-testid={`product-${product.name
+          .toLowerCase()
+          .replace(/\s+/g, "-")}`}
+      >
         <div
           className={`product-card ${product.in_stock ? "" : "out_stock"}`}
           onMouseLeave={() => handleMouseLeave(null)}
           onMouseEnter={() => handleMouseEnter(product.id)}
-          onClick={() => showFullInfo(product)}
+          onClick={this.handleClick}
         >
           <div className="product-image">
             {product.images.length > 0 ? (
@@ -51,7 +96,14 @@ class Product extends Component {
                   : "d-none"
               }`}
             >
-              <button className="add-to-cart">
+              <button
+                className="add-to-cart"
+                onClick={(event) => {
+                  event.stopPropagation(); // Stopping Propagation
+                  this.handleAddToCart(); // Adding goods to cart
+                }}
+                data-testid="add-to-cart"
+              >
                 <img src={ShoppingCart} alt="Cart" className="cart-icon" />
               </button>
             </div>
@@ -62,4 +114,8 @@ class Product extends Component {
   }
 }
 
-export default Product;
+const mapDispatchToProps = {
+  addItem,
+};
+
+export default connect(null, mapDispatchToProps)(Product);
