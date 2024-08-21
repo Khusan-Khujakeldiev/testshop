@@ -27,8 +27,8 @@ class Header extends Component {
         }
       `,
     };
-
-    fetch("http://localhost:8080/graphql", {
+    // Localhost::8080
+    fetch("https://www.scandiwebtestshop.wuaze.com/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -74,20 +74,26 @@ class Header extends Component {
                     const isActive =
                       currentCategory === firstLetterToUppercase(i.name);
                     return (
-                      <li
-                        className={`nav-item mx-2 ${isActive ? "active" : ""}`}
-                        key={i.id}
-                        data-testid={
-                          isActive ? "active-category-link" : "category-link"
-                        }
-                        onClick={() => {
-                          chooseCategory(firstLetterToUppercase(i.name));
-                          if (showFullItem) {
-                            showFullInfo();
+                      <li>
+                        <a
+                          href={`/${i.name}`}
+                          className={`nav-item mx-2 ${
+                            isActive ? "active" : ""
+                          }`}
+                          key={i.id}
+                          data-testid={
+                            isActive ? "active-category-link" : "category-link"
                           }
-                        }}
-                      >
-                        {firstLetterToUppercase(i.name)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            chooseCategory(firstLetterToUppercase(i.name));
+                            if (showFullItem) {
+                              showFullInfo();
+                            }
+                          }}
+                        >
+                          {firstLetterToUppercase(i.name)}
+                        </a>
                       </li>
                     );
                   })}

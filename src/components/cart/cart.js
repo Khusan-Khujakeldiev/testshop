@@ -63,9 +63,9 @@ class Cart extends Component {
       },
     };
 
-    console.log("Sending mutation with payload:", mutationQuery);
-
-    fetch("http://localhost:8080/graphql", {
+    // console.log("Sending mutation with payload:", mutationQuery);
+    // http://localhost:8080/graphql
+    fetch("https://www.scandiwebtestshop.wuaze.com/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

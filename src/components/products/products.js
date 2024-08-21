@@ -15,7 +15,8 @@ class Products extends Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:8080/graphql", {
+    // local
+    fetch("https://www.scandiwebtestshop.wuaze.com/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

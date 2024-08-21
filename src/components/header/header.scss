@@ -7,7 +7,10 @@
       list-style: none;
       padding-left: 0;
   
-      li {
+      li  {
+        a{
+          color: #000;
+        text-decoration: none;
         position: relative;
         margin: 0 10px;
         cursor: pointer;
@@ -41,6 +44,7 @@
           width: 100%;
         }
       }
+    }
     }
   
     .cart-item-count {

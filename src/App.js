@@ -40,6 +40,7 @@ class App extends Component {
       <div className="wrapper">
         {isCartVisible && (
           <div
+            data-testid="cart-overlay"
             className="overlay-backdrop"
             onClick={this.toggleCartVisibility}
           ></div>
