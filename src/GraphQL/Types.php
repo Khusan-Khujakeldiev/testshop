@@ -1,5 +1,4 @@
 <?php
-
 namespace App\GraphQL;
 
 use GraphQL\Type\Definition\InputObjectType;
@@ -7,20 +6,24 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Doctrine\DBAL\Connection;
 
-class Types {
-    private static $product;
-    private static $category;
-    private static $price;
-    private static $order;
-    private static $attributeValue;
-    private static $attribute;
-    private static $image;
-    private static $query;
-    private static $mutation;
-    private static $createOrderInput;
+class Types extends BaseType {
+    private $product;
+    private $category;
+    private $price;
+    private $order;
+    private $attributeValue;
+    private $attribute;
+    private $image;
+    private $query;
+    private $mutation;
+    private $createOrderInput;
 
-    public static function product() {
-        return self::$product ?: (self::$product = new ObjectType([
+    public function __construct(Connection $db) {
+        parent::__construct($db); // Вызов конструктора базового класса
+    }
+
+    private function product() {
+        return $this->product ?: ($this->product = new ObjectType([
             'name' => 'Product',
             'fields' => [
                 'id' => Type::nonNull(Type::string()),
@@ -29,53 +32,41 @@ class Types {
                 'in_stock' => Type::boolean(),
                 'brand' => Type::string(),
                 'category' => [
-                    'type' => self::category(),
-                    'resolve' => function ($product, $args, $context) {
-                        $db = $context['db'];
+                    'type' => $this->category(),
+                    'resolve' => function ($product, $args) {
                         $sql = "SELECT * FROM categories WHERE id = ?";
-                        $stmt = $db->prepare($sql);
-                        $result = $stmt->executeQuery([$product['category_id']]);
-                        return $result->fetchAssociative();
+                        return $this->resolveAssociative($sql, $product['category_id']);
                     }
                 ],
                 'price' => [
-                    'type' => Type::listOf(self::price()),
-                    'resolve' => function ($product, $args, $context) {
-                        $db = $context['db'];
+                    'type' => Type::listOf($this->price()),
+                    'resolve' => function ($product, $args) {
                         $sql = "SELECT * FROM prices WHERE product_id = ?";
-                        $stmt = $db->prepare($sql);
-                        $result = $stmt->executeQuery([$product['id']]);
-                        return $result->fetchAllAssociative();
+                        return $this->resolveAllAssociative($sql, $product['id']);
                     }
                 ],
                 'attributes' => [
-                    'type' => Type::listOf(self::attributeValue()),
-                    'resolve' => function ($product, $args, $context) {
-                        $db = $context['db'];
+                    'type' => Type::listOf($this->attributeValue()),
+                    'resolve' => function ($product, $args) {
                         $sql = "SELECT av.* FROM attribute_values av
                                 JOIN product_attributes pa ON av.id = pa.attribute_value_id
                                 WHERE pa.product_id = ?";
-                        $stmt = $db->prepare($sql);
-                        $result = $stmt->executeQuery([$product['id']]);
-                        return $result->fetchAllAssociative();
+                        return $this->resolveAllAssociative($sql, $product['id']);
                     }
                 ],
                 'images' => [
-                    'type' => Type::listOf(self::image()),
-                    'resolve' => function ($product, $args, $context) {
-                        $db = $context['db'];
+                    'type' => Type::listOf($this->image()),
+                    'resolve' => function ($product, $args) {
                         $sql = "SELECT * FROM product_images WHERE product_id = ?";
-                        $stmt = $db->prepare($sql);
-                        $result = $stmt->executeQuery([$product['id']]);
-                        return $result->fetchAllAssociative();
+                        return $this->resolveAllAssociative($sql, $product['id']);
                     }
                 ]
             ]
         ]));
     }
 
-    public static function category() {
-        return self::$category ?: (self::$category = new ObjectType([
+    private function category() {
+        return $this->category ?: ($this->category = new ObjectType([
             'name' => 'Category',
             'fields' => [
                 'id' => Type::nonNull(Type::int()),
@@ -84,8 +75,8 @@ class Types {
         ]));
     }
 
-    public static function price() {
-        return self::$price ?: (self::$price = new ObjectType([
+    private function price() {
+        return $this->price ?: ($this->price = new ObjectType([
             'name' => 'Price',
             'fields' => [
                 'amount' => Type::float(),
@@ -95,21 +86,8 @@ class Types {
         ]));
     }
 
-    public static function order() {
-        return self::$order ?: (self::$order = new ObjectType([
-            'name' => 'Order',
-            'fields' => [
-                'id' => Type::nonNull(Type::int()),
-                'product' => self::product(),
-                'productName' => Type::string(),
-                'quantity' => Type::int(),
-                'createdAt' => Type::string(),
-            ]
-        ]));
-    }
-
-    public static function attributeValue() {
-        return self::$attributeValue ?: (self::$attributeValue = new ObjectType([
+    private function attributeValue() {
+        return $this->attributeValue ?: ($this->attributeValue = new ObjectType([
             'name' => 'AttributeValue',
             'fields' => [
                 'id' => Type::nonNull(Type::string()),
@@ -117,21 +95,18 @@ class Types {
                 'display_value' => Type::string(),
                 'value' => Type::string(),
                 'attribute' => [
-                    'type' => self::attribute(),
-                    'resolve' => function ($attributeValue, $args, $context) {
-                        $db = $context['db'];
+                    'type' => $this->attribute(),
+                    'resolve' => function ($attributeValue, $args) {
                         $sql = "SELECT * FROM attributes WHERE id = ?";
-                        $stmt = $db->prepare($sql);
-                        $result = $stmt->executeQuery([$attributeValue['attribute_id']]);
-                        return $result->fetchAssociative();
+                        return $this->resolveAssociative($sql, $attributeValue['attribute_id']);
                     }
                 ]
             ]
         ]));
     }
 
-    public static function attribute() {
-        return self::$attribute ?: (self::$attribute = new ObjectType([
+    private function attribute() {
+        return $this->attribute ?: ($this->attribute = new ObjectType([
             'name' => 'Attribute',
             'fields' => [
                 'id' => Type::nonNull(Type::string()),
@@ -141,8 +116,8 @@ class Types {
         ]));
     }
 
-    public static function image() {
-        return self::$image ?: (self::$image = new ObjectType([
+    private function image() {
+        return $this->image ?: ($this->image = new ObjectType([
             'name' => 'Image',
             'fields' => [
                 'product_id' => Type::nonNull(Type::string()),
@@ -151,56 +126,63 @@ class Types {
         ]));
     }
 
-    public static function query(Connection $db) {
-        return self::$query ?: (self::$query = new ObjectType([
+    private function order() {
+        return $this->order ?: ($this->order = new ObjectType([
+            'name' => 'Order',
+            'fields' => [
+                'id' => Type::nonNull(Type::int()),
+                'product' => $this->product(),
+                'productName' => Type::string(),
+                'quantity' => Type::int(),
+                'createdAt' => Type::string(),
+            ]
+        ]));
+    }
+
+    public function query() {
+        return $this->query ?: ($this->query = new ObjectType([
             'name' => 'Query',
             'fields' => [
                 'product' => [
-                    'type' => self::product(),
+                    'type' => $this->product(),
                     'args' => [
                         'id' => Type::nonNull(Type::string())
                     ],
-                    'resolve' => function ($root, $args) use ($db) {
+                    'resolve' => function ($root, $args) {
                         $sql = "SELECT * FROM products WHERE id = ?";
-                        $stmt = $db->prepare($sql);
-                        $result = $stmt->executeQuery([$args['id']]);
-                        return $result->fetchAssociative();
+                        return $this->resolveAssociative($sql, $args['id']);
                     }
                 ],
                 'products' => [
-                    'type' => Type::listOf(self::product()),
-                    'resolve' => function ($root, $args) use ($db) {
+                    'type' => Type::listOf($this->product()),
+                    'resolve' => function () {
                         $sql = "SELECT * FROM products";
-                        $stmt = $db->executeQuery($sql);
-                        return $stmt->fetchAllAssociative();
+                        return $this->resolveAllAssociative($sql,[]);
                     }
                 ],
                 'category' => [
-                    'type' => self::category(),
+                    'type' => $this->category(),
                     'args' => [
                         'id' => Type::nonNull(Type::int())
                     ],
-                    'resolve' => function ($root, $args) use ($db) {
+                    'resolve' => function ($root, $args) {
                         $sql = "SELECT * FROM categories WHERE id = ?";
-                        $stmt = $db->prepare($sql);
-                        $result = $stmt->executeQuery([$args['id']]);
-                        return $result->fetchAssociative();
+                        return $this->resolveAssociative($sql, $args['id']);
                     }
                 ],
                 'categories' => [
-                    'type' => Type::listOf(self::category()),
-                    'resolve' => function ($root, $args) use ($db) {
+                    'type' => Type::listOf($this->category()),
+                    'resolve' => function () {
                         $sql = "SELECT * FROM categories";
-                        $stmt = $db->executeQuery($sql);
-                        return $stmt->fetchAllAssociative();
+                        return $this->resolveAllAssociative($sql,[] );
                     }
                 ]
             ]
         ]));
     }
 
-    public static function createOrderInput() {
-        return self::$createOrderInput ?: (self::$createOrderInput = new InputObjectType([
+    private function createOrderInput() {
+        return $this->createOrderInput ?: ($this->createOrderInput = new InputObjectType([
             'name' => 'CreateOrderInput',
             'fields' => [
                 'productId' => Type::nonNull(Type::string()),
@@ -217,42 +199,35 @@ class Types {
         ]));
     }
 
-    public static function mutation(Connection $db) {
-        return self::$mutation ?: (self::$mutation = new ObjectType([
+    public function mutation() {
+        return $this->mutation ?: ($this->mutation = new ObjectType([
             'name' => 'Mutation',
             'fields' => [
                 'createOrder' => [
-                    'type' => self::order(),
+                    'type' => $this->order(),
                     'args' => [
-                        'input' => Type::nonNull(self::createOrderInput()),
+                        'input' => Type::nonNull($this->createOrderInput()),
                     ],
-                    'resolve' => function ($root, $args) use ($db) {
+                    'resolve' => function ($root, $args) {
                         $input = $args['input'];
-    
-                        // Inserting data to database table
+
                         $sql = "INSERT INTO orders (product_id, product_name, quantity, created_at) VALUES (?, ?, ?, NOW())";
-                        $stmt = $db->prepare($sql);
+                        $stmt = $this->db->prepare($sql);
                         $stmt->executeStatement([$input['productId'], $input['productName'], $input['quantity']]);
-    
-                        // getting id of gotten order
-                        $orderId = $db->lastInsertId();
-    
-                        // Adding attributes and connecting to Orders tables if attributes exist
+
+                        $orderId = $this->db->lastInsertId();
+
                         if (!empty($input['attributes'])) {
                             foreach ($input['attributes'] as $attribute) {
                                 $sql = "INSERT INTO order_attributes (order_id, attribute_name, attribute_value) VALUES (?, ?, ?)";
-                                $stmt = $db->prepare($sql);
+                                $stmt = $this->db->prepare($sql);
                                 $stmt->executeStatement([$orderId, $attribute['name'], $attribute['value']]);
                             }
                         }
-    
-                        // getting and returning orders
+
                         $sql = "SELECT * FROM orders WHERE id = ?";
-                        $stmt = $db->prepare($sql);
-                        $result = $stmt->executeQuery([$orderId]);
-                        $orderData = $result->fetchAssociative();
-    
-                        // creating returning object
+                        $orderData = $this->resolveAssociative($sql, $orderId);
+
                         return [
                             'id' => $orderData['id'],
                             'product' => [
@@ -268,5 +243,6 @@ class Types {
             ]
         ]));
     }
-    
 }
+
+

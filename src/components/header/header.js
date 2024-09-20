@@ -5,6 +5,7 @@ import CartIcon from "../../img/cart-icon.svg";
 import EmptyCart from "../../img/empty-cart.svg";
 import { firstLetterToUppercase } from "../../utils/stringUtils";
 import Cart from "../cart/cart";
+import { fetchCategories } from "../../services/categoryService";
 
 class Header extends Component {
   constructor(props) {
@@ -16,36 +17,17 @@ class Header extends Component {
     };
   }
 
-  componentDidMount() {
-    const query = {
-      query: `
-        query GetCategories {
-          categories {
-            id
-            name
-          }
-        }
-      `,
-    };
-    // Localhost::8080
-    fetch("https://www.scandiwebtestshop.wuaze.com/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(query),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.errors) {
-          this.setState({ error: result.errors[0], loading: false });
-        } else {
-          this.setState({ categories: result.data.categories, loading: false });
-        }
-      })
-      .catch((error) => {
-        this.setState({ error, loading: false });
+  async componentDidMount() {
+    try {
+      const result = await fetchCategories();
+      this.setState({
+        categories: result.data.categories,
+        loading: false,
+        error: null,
       });
+    } catch (error) {
+      this.setState({ error, loading: false });
+    }
   }
 
   render() {
@@ -74,16 +56,12 @@ class Header extends Component {
                     const isActive =
                       currentCategory === firstLetterToUppercase(i.name);
                     return (
-                      <li>
+                      <li key={i.id}>
                         <a
                           href={`/${i.name}`}
                           className={`nav-item mx-2 ${
                             isActive ? "active" : ""
                           }`}
-                          key={i.id}
-                          data-testid={
-                            isActive ? "active-category-link" : "category-link"
-                          }
                           onClick={(e) => {
                             e.preventDefault();
                             chooseCategory(firstLetterToUppercase(i.name));
@@ -110,13 +88,7 @@ class Header extends Component {
               className="col d-flex justify-content-end position-relative"
               onClick={() => toggleCartVisibility()}
             >
-              <img
-                role="button"
-                data-testid="cart-btn"
-                tabIndex="0"
-                src={EmptyCart}
-                alt="Cart"
-              />
+              <img role="button" tabIndex="0" src={EmptyCart} alt="Cart" />
               {cartItemCount >= 0 && (
                 <div className="cart-item-count">{cartItemCount}</div>
               )}

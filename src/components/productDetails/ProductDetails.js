@@ -3,6 +3,10 @@ import parse from "html-react-parser";
 import { connect } from "react-redux";
 import { addItem } from "../../reducers/cartSlice";
 import "./productDetails.scss";
+import {
+  createCartItemFromProduct,
+  checkAllAttributesSelected,
+} from "../../utils/productUtils";
 
 class ProductDetails extends Component {
   constructor(props) {
@@ -61,8 +65,9 @@ class ProductDetails extends Component {
     const { currentItem } = this.props;
     const { selectedAttributes } = this.state;
 
-    const allAttributesSelected = currentItem.attributes.every(
-      (attribute) => selectedAttributes[attribute.attribute.name]
+    const allAttributesSelected = checkAllAttributesSelected(
+      currentItem,
+      selectedAttributes
     );
 
     this.setState({ allAttributesSelected });
@@ -73,28 +78,9 @@ class ProductDetails extends Component {
       this.props;
     const { selectedAttributes } = this.state;
 
-    const allAttributes = currentItem.attributes.reduce((acc, attr) => {
-      const attributeName = attr.attribute.name;
-      if (!acc[attributeName]) {
-        acc[attributeName] = [];
-      }
-      if (!acc[attributeName].includes(attr.display_value)) {
-        acc[attributeName].push(attr.display_value);
-      }
-      return acc;
-    }, {});
-
-    const item = {
-      id: currentItem.id,
-      name: currentItem.name,
-      price: currentItem.price[0].amount,
-      currency_symbol: currentItem.price[0].currency_symbol,
-      attributes: selectedAttributes,
-      allAttributes,
-      image: currentItem.images[0].image_url,
-    };
-
+    const item = createCartItemFromProduct(currentItem, selectedAttributes);
     addItem(item);
+
     if (!isCartVisible) {
       toggleCartVisibility();
     }

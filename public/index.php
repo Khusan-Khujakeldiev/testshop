@@ -1,14 +1,18 @@
 <?php
-// public/index.php
 
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' www.scandiwebtestshop.wuaze.com ");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRFToken");
 
-// Handle OPTIONS request
 
-// Подключаем автозагрузчик Composer
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header("HTTP/1.1 200 OK");
+    exit();
+}
+
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Dotenv\Dotenv;
@@ -16,6 +20,8 @@ use Doctrine\DBAL\DriverManager;
 use App\Controller\GraphQLController;
 use FastRoute\RouteCollector;
 use FastRoute\Dispatcher;
+
+
 
 // Загружаем переменные окружения из .env
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
