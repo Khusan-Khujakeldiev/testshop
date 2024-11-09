@@ -82,14 +82,17 @@ class Header extends Component {
               className="col d-flex justify-content-center"
               onClick={() => (showFullItem ? showFullInfo() : "")}
             >
-              <img role="button" tabIndex="0" src={CartIcon} alt="Home" />
+              <img tabIndex="0" src={CartIcon} alt="Home" />
             </div>
             <div
               className="col d-flex justify-content-end position-relative"
               onClick={() => toggleCartVisibility()}
             >
-              <img role="button" tabIndex="0" src={EmptyCart} alt="Cart" />
-              {cartItemCount >= 0 && (
+              <button data-testid="cart-btn">
+                <img tabIndex="0" src={EmptyCart} alt="Cart" />
+              </button>
+
+              {cartItemCount > 0 && (
                 <div className="cart-item-count">{cartItemCount}</div>
               )}
             </div>
