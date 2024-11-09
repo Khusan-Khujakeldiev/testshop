@@ -29,13 +29,16 @@ export const createOrder = async (cartItems) => {
     },
   };
 
-  const response = await fetch("http://localhost:8080/graphql", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(mutationQuery),
-  });
+  const response = await fetch(
+    "https://12c4-80-89-73-250.ngrok-free.app/graphql",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(mutationQuery),
+    }
+  );
 
   return response.json();
 };
