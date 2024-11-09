@@ -84,11 +84,11 @@ class Header extends Component {
             >
               <img tabIndex="0" src={CartIcon} alt="Home" />
             </div>
-            <div
-              className="col d-flex justify-content-end position-relative"
-              onClick={() => toggleCartVisibility()}
-            >
-              <button data-testid="cart-btn">
+            <div className="col d-flex justify-content-end position-relative">
+              <button
+                data-testid="cart-btn"
+                onClick={() => toggleCartVisibility()}
+              >
                 <img tabIndex="0" src={EmptyCart} alt="Cart" />
               </button>
 
